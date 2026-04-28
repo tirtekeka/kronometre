@@ -28,6 +28,8 @@
             padding: 50px;
             box-shadow: 0 0 50px rgba(255, 107, 53, 0.3), 0 0 100px rgba(255, 107, 53, 0.1);
             backdrop-filter: blur(10px);
+            max-width: 600px;
+            width: 90%;
         }
         
         .title {
@@ -113,7 +115,7 @@
         .status {
             color: #aaa;
             font-size: 0.9em;
-            margin-top: 20px;
+            margin: 20px 0;
             letter-spacing: 1px;
         }
         
@@ -133,6 +135,115 @@
             margin-top: 20px;
             text-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
             display: none;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: 'Courier New', monospace;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-ban-yedim {
+            background: linear-gradient(45deg, #ff0000, #ff4444);
+            color: white;
+            border: 2px solid #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            animation: pulse-red 2s infinite;
+        }
+        
+        .btn-ban-yedim:hover {
+            background: linear-gradient(45deg, #cc0000, #ff0000);
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
+            transform: scale(1.05);
+        }
+        
+        .btn-ban-yedim:active {
+            transform: scale(0.95);
+        }
+        
+        @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(255, 0, 0, 0.8); }
+        }
+        
+        .btn-ban-yemedim {
+            background: linear-gradient(45deg, #00cc00, #00ff00);
+            color: white;
+            border: 2px solid #00cc00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            animation: pulse-green 2s infinite;
+        }
+        
+        .btn-ban-yemedim:hover {
+            background: linear-gradient(45deg, #009900, #00cc00);
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.8);
+            transform: scale(1.05);
+        }
+        
+        .btn-ban-yemedim:active {
+            transform: scale(0.95);
+        }
+        
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(0, 255, 0, 0.8); }
+        }
+        
+        .message-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message-ban-yedim {
+            background: rgba(255, 0, 0, 0.2);
+            border: 2px solid #ff0000;
+            color: #ff4444;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        }
+        
+        .message-ban-yemedim {
+            background: rgba(0, 255, 0, 0.2);
+            border: 2px solid #00ff00;
+            color: #4CAF50;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        }
+        
+        .vurgula {
+            font-size: 1.3em;
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -169,6 +280,17 @@
         <div class="completed-message" id="completedMessage">
             🎉 SÜRE DOLDU! Gece 01:00 oldu! 🎉
         </div>
+        
+        <div class="button-group">
+            <button class="btn btn-ban-yedim" onclick="banYedim()">
+                🚫 BAN YEDİM
+            </button>
+            <button class="btn btn-ban-yemedim" onclick="banYemedim()">
+                ✅ BAN YEMEDİM
+            </button>
+        </div>
+        
+        <div class="message-box" id="messageBox"></div>
     </div>
 
     <script>
@@ -179,12 +301,6 @@
             let target = new Date(now);
             target.setHours(1, 0, 0, 0);
             
-            // Eğer şimdiki zaman 00:00'dan sonra ve 01:00'dan önceyse (gece yarısından sonra)
-            // hedef hala bugünkü 01:00
-            // Eğer 01:00'dan sonraysa, hedef yarınki 01:00 olmalı (18:18 için düşünürsek)
-            
-            // Ama burada özel durum: 18:18'den gece 01:00'a
-            // Eğer saat 18:18'den büyükse veya 01:00'dan küçükse
             const currentHour = now.getHours();
             const currentMinute = now.getMinutes();
             
@@ -194,10 +310,8 @@
                 target.setDate(target.getDate() + 1);
             } else if (currentHour < 1 || (currentHour === 1 && currentMinute === 0)) {
                 // Gece 01:00'dan önce, hedef bugün gece 01:00
-                // target zaten bugün 01:00 olarak ayarlı
             } else {
-                // 01:00 ile 18:18 arası, hedef bugün gece 01:00 (zaten geçmiş)
-                // Bu durumda yarınki 01:00'ı hedefle
+                // 01:00 ile 18:18 arası, hedef yarınki 01:00
                 target.setDate(target.getDate() + 1);
             }
             
@@ -205,9 +319,6 @@
             let startTime = new Date(now);
             startTime.setHours(18, 18, 0, 0);
             
-            // Eğer 18:18'den sonraysak ve hedef yarınki 01:00 ise
-            // başlangıç bugünkü 18:18
-            // Eğer 18:18'den önceysek, başlangıç dünkü 18:18
             if (currentHour < 18 || (currentHour === 18 && currentMinute < 18)) {
                 startTime.setDate(startTime.getDate() - 1);
             }
@@ -247,6 +358,44 @@
             } else {
                 statusElement.textContent = `⏳ Gece 01:00'a ${minutes} dakika ${seconds} saniye kaldı...`;
             }
+        }
+        
+        function banYedim() {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.className = 'message-box message-ban-yedim';
+            messageBox.innerHTML = '🚫 <span class="vurgula">Sıkıntı yok!</span> Çalışıyor, sen belli etmişsindir... 🤫';
+            messageBox.style.display = 'block';
+            
+            // Mesajı 5 saniye sonra gizle
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 5000);
+            
+            // Buton efektleri
+            const btn = document.querySelector('.btn-ban-yedim');
+            btn.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                btn.style.transform = 'scale(1)';
+            }, 200);
+        }
+        
+        function banYemedim() {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.className = 'message-box message-ban-yemedim';
+            messageBox.innerHTML = '🌟 <span class="vurgula">AFERİN!</span> İşte böyle devam, şimdi her şeyi kodlamaya başla butonu! 💪😎';
+            messageBox.style.display = 'block';
+            
+            // Mesajı 5 saniye sonra gizle
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 5000);
+            
+            // Buton efektleri
+            const btn = document.querySelector('.btn-ban-yemedim');
+            btn.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                btn.style.transform = 'scale(1)';
+            }, 200);
         }
         
         // Hemen güncelle ve her saniye güncellemeye devam et
